@@ -11,8 +11,10 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.appcitas.R
 import com.example.appcitas.databinding.FragmentCitaBinding
+import com.example.appcitas.databinding.FragmentEditarCItaBinding
 import com.example.appcitas.dialogo.DateDialogo
 import com.example.appcitas.dialogo.TimeDialogo
 import com.example.appcitas.model.Cita
@@ -21,24 +23,35 @@ import com.google.firebase.database.FirebaseDatabase
 import java.util.UUID
 
 
-class CitaFragment : Fragment() {
-    private lateinit var binding: FragmentCitaBinding
-    private lateinit var selectedOption: String
-    private lateinit var selectedDate: String
-    private lateinit var selectedTime: String
+class EditarCItaFragment : Fragment() {
+    private lateinit var binding: FragmentEditarCItaBinding
+    private val args: EditarCItaFragmentArgs by navArgs()
+    private var selectedOption: String = ""
+
+    private var selectedDate: String = ""
+
+    private  var selectedTime: String = ""
     var idnumero: Int = 0
     private var selectedColor: Int = Color.BLACK
+    private  var cita: Cita? = null
+
     private lateinit var reference: DatabaseReference
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentCitaBinding.inflate(layoutInflater)
+        binding = FragmentEditarCItaBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+      cita = args.cita
+        establecerdatos()
+        seleccionarOpcion()
+        binding.titulo.setText("Editar cita")
+        binding.btnRegistrar.setText("Editar cita")
         reference = FirebaseDatabase.getInstance().getReference("Citas")
         // Configurar el botón para mostrar el diálogo de selección de fecha
         binding.BTNHORA.setOnClickListener {
@@ -61,16 +74,28 @@ class CitaFragment : Fragment() {
             }
         }
         // Configurar el botón para mostrar el diálogo de selección de sexo
-        seleccionarOpcion()
         binding.btnRegistrar.setOnClickListener {
-            registarCita()
-
+            editarCita()
         }
         binding.btnSelectColor.setOnClickListener {
             showColorPickerDialog()
         }
+
+
     }
 
+    private fun establecerdatos() {
+
+        binding.nombreUsuario.setText(cita?.nombre)
+        binding.apellidoUsuario.setText(cita?.apellido)
+        binding.email.setText(cita?.email)
+        binding.telefono.setText(cita?.fecha)
+        //binding.mySpinner.setSelection(cita?.sexo)
+        binding.TITULOOFECHA.setText(cita?.fecha)
+        binding.TITULOHORA.setText(cita?.hora)
+
+
+    }
 
     private fun seleccionarOpcion() {
         val options = listOf("masculino", "femenino")
@@ -104,7 +129,6 @@ class CitaFragment : Fragment() {
             }
         }
     }
-
     private fun showColorPickerDialog() {
         val colors = arrayOf("Rojo", "Verde", "Azul", "Amarillo", "Negro")
         val colorValues = arrayOf(
@@ -125,11 +149,15 @@ class CitaFragment : Fragment() {
             .show()
     }
 
-    private fun registarCita() {
+    private fun editarCita() {
+
         val nombre = binding.nombreUsuario.text.toString()
         val apellido = binding.apellidoUsuario.text.toString()
         val email = binding.email.text.toString()
         val telefono = binding.telefono.text.toString()
+        selectedDate = cita?.fecha.toString()
+        selectedTime = cita?.hora.toString()
+
         val fecha = selectedDate
         val hora = selectedTime
         val sexo: String = selectedOption
@@ -137,30 +165,36 @@ class CitaFragment : Fragment() {
 
         if (nombre.isNotEmpty() && apellido.isNotEmpty() && email.isNotEmpty()
             && telefono.isNotEmpty() && fecha.isNotEmpty() && hora.isNotEmpty()
-            && sexo.isNotEmpty()) {
+            && sexo.isNotEmpty()
+        ) {
             val random = UUID.randomUUID().toString()
-            val cita = Cita(random,nombre, email, apellido, fecha, hora, sexo ,
-                String.format("#%08X", (selectedColor)),telefono)
-            reference.child(random).setValue(cita).addOnSuccessListener {
+            val cita = Cita(random, nombre, email, apellido, fecha, hora,
+                sexo,String.format("#%08X", (selectedColor)), telefono )
+            reference.child(cita.id).setValue(cita).addOnSuccessListener {
                 binding.nombreUsuario.text?.clear()
                 binding.apellidoUsuario.text?.clear()
                 binding.email.text?.clear()
                 binding.telefono.text?.clear()
-                Toast.makeText(requireContext(), "Cita registrada exitosamente", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_citaFragment_to_pacienteFragment)
+                Toast.makeText(requireContext(), "Cita modificada exitosamente", Toast.LENGTH_SHORT)
+                    .show()
+                findNavController().navigate(R.id.action_editarCItaFragment_to_pacienteFragment)
 
 
 
             }.addOnFailureListener {
-                Toast.makeText(requireContext(), "Error al registrar la cita", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error al registrar la cita", Toast.LENGTH_SHORT)
+                    .show()
             }
 
 
-        }else{
-            Toast.makeText(requireContext(), "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Por favor, completa todos los campos",
+                Toast.LENGTH_SHORT
+            ).show()
 
         }
     }
-
 
 }

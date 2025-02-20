@@ -21,7 +21,11 @@
         android:id="@+id/doctorFragment"
         android:name="com.example.appcitas.fragmen.DoctorFragment"
         android:label="fragment_doctor"
-        tools:layout="@layout/fragment_doctor" />
+        tools:layout="@layout/fragment_doctor" >
+        <action
+            android:id="@+id/action_doctorFragment_to_verCitaAdministradorFragment"
+            app:destination="@id/verCitaAdministradorFragment" />
+    </fragment>
     <fragment
         android:id="@+id/pacienteFragment"
         android:name="com.example.appcitas.fragmen.PacienteFragment"
@@ -30,10 +34,35 @@
         <action
             android:id="@+id/action_pacienteFragment_to_citaFragment"
             app:destination="@id/citaFragment" />
+        <action
+            android:id="@+id/action_pacienteFragment_to_editarCItaFragment"
+            app:destination="@id/editarCItaFragment" />
     </fragment>
     <fragment
         android:id="@+id/citaFragment"
         android:name="com.example.appcitas.fragmen.CitaFragment"
         android:label="fragment_cita"
-        tools:layout="@layout/fragment_cita" />
+        tools:layout="@layout/fragment_cita" >
+        <action
+            android:id="@+id/action_citaFragment_to_pacienteFragment"
+            app:destination="@id/pacienteFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editarCItaFragment"
+        android:name="com.example.appcitas.fragmen.EditarCItaFragment"
+        android:label="fragment_editar_c_ita"
+        tools:layout="@layout/fragment_editar_c_ita" >
+        <argument
+            android:name="cita"
+            app:argType="com.example.appcitas.model.Cita"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_editarCItaFragment_to_pacienteFragment"
+            app:destination="@id/pacienteFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/verCitaAdministradorFragment"
+        android:name="com.example.appcitas.fragmen.VerCitaAdministradorFragment"
+        android:label="fragment_ver_cita_administrador"
+        tools:layout="@layout/fragment_ver_cita_administrador" />
 </navigation>

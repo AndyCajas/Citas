@@ -25,7 +25,7 @@ private lateinit var binding: FragmentInicioBinding
         binding.beteNDoctor.setOnClickListener {
             findNavController().navigate(R.id.action_inicioFragment_to_doctorFragment)
         }
-        binding.beteNDoctor.setOnClickListener {
+        binding.beteNPaciente.setOnClickListener {
             findNavController().navigate(R.id.action_inicioFragment_to_pacienteFragment)
         }
     }
